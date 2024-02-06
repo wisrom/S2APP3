@@ -1,6 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
+
 # Load the data from the CSV file
 donnees = np.genfromtxt('GEL242-DonneesGenieUdeS.csv', delimiter=',', skip_header=1, dtype=str)
 
@@ -10,19 +11,57 @@ genres = donnees[:, 1]  # Assuming genres are in the second column
 cycles = donnees[:, 2].astype(int)  # Assuming cycles are in the third column
 grandeurs = donnees[:, 3].astype(float)  # Assuming grandeur is in the fourth column
 
+data_array = np.vstack((genres, grandeurs)).T
+
+# 'T' transposes the array to have two columns: gender and height
+
+print(data_array)
 # Count occurrences of each genre
 occurrences = {}
-for genre in genres:
-    if genre in occurrences:
-        occurrences[genre] += 1
-    else:
-        occurrences[genre] = 1
+# Compter les occurrences des genres
+def calc_occurrencesFille():
+    mask = (genres == 'H')
 
+    # Apply the mask to select only the arrays where the first element in 'genres' is 'H'
+    selected_data = grandeurs[mask]
+    moyenne=np.mean(selected_data)
+    print(np.mean(selected_data))
+calc_occurrencesFille()
+
+def nbPersonneBac():
+    mask = (cycles == 1)
+    selected_data = cycles[mask]
+    print(str(len(selected_data)))
+nbPersonneBac()
+
+def nbFilleDoc():
+
+    mask = (genres == 'F') & (cycles == 3)
+    selected_data = donnees[mask]
+    print(str(len(selected_data)))
+nbFilleDoc()
+def Histogramme():
+    Taille_moyenne = []
+    moyenne = np.mean(grandeurs)
+    Taille_moyenne.append(moyenne)
+    print(Taille_moyenne)
+    plt.figure(figsize= (8,6))
+    plt.hist(grandeurs, bins=30, edgecolor = 'black')
+
+    plt.title("Grandeurs des étudiants")
+    plt.xlabel("Grandeur des personnes")
+    plt.ylabel("Fréquence")
+    plt.show()
+Histogramme()
+
+
+for genre in genres:
+    occurrences[genre] = occurrences.get(genre, 0) + 1
+
+# Compter les occurrences des cycles
 for cycle in cycles:
-    if cycle in occurrences:
-        occurrences[cycle] += 1
-    else:
-        occurrences[cycle] = 1
+    occurrences[cycle] = occurrences.get(cycle, 0) + 1
+
 
 
 # Print occurrences of each genre
@@ -49,7 +88,7 @@ pourcentBac()
 
 
 def filles_doc():
-    total_filles = occurrences.get('F',0)
+    total_filles = occurrences.get('F', 0)
     count_filles_doc = 0
     for i in range (len(cycles)):
         if cycles[i] == 3 and genres[i] == 'F':
@@ -60,6 +99,33 @@ def filles_doc():
 filles_doc()
 # Analyze the data with NumPy
 #diagramme à bande
+def Bande():
+    Cycle_unique = np.unique(cycles)
+    moyenne_grandeur = []
+    ecart_type = []
+    for k in range(1, 4):  # We'll check for cycles 1, 2, and 3
+        mask = (cycles == k)
+        selected_data = grandeurs[mask]
+
+        if len(selected_data) > 0:  # Check if selected_data is not empty
+            moyenne = np.mean(selected_data)
+            std_dev = np.std(selected_data)
+            moyenne_grandeur.append(moyenne)
+            ecart_type.append(std_dev)
+            print(f"La moyenne est de {moyenne} et l'écart-type est de {std_dev} pour le cycle {k}")
+        else:
+            print(f"Aucune donnée disponible pour le cycle {k}")
+
+    cycles_labels = ['Bac', 'Maitrise', 'Doctorat']  # Adding 'Doctorat' for cycle 3
+    X = np.array(cycles_labels)
+
+    plt.bar(Cycle_unique, moyenne_grandeur, color='b', align='center', yerr=ecart_type)
+    plt.title('Grandeur moyenne selon le cycle')
+    plt.xlabel('Cycle')
+    plt.ylabel('Grandeur (cm)')
+    plt.xticks(Cycle_unique)
+    plt.show()
+Bande()
 def digramme1():
     # Données
     cycles_uniques = np.unique(cycles)
@@ -68,6 +134,7 @@ def digramme1():
 
     # Calcul des moyennes et des écarts-types pour chaque cycle
     for cycle in cycles_uniques:
+        #on dompe les données dans des tableaux pour les stockers et faires des opérations
         grandeurs_cycle = grandeurs[cycles == cycle]
         moyenne_cycle = np.mean(grandeurs_cycle)
         ecart_type_cycle = np.std(grandeurs_cycle)
@@ -105,6 +172,7 @@ def diagramme2():
     plt.show()
 diagramme2()
 def diagramme3():
+    #création d'un dictionnaire qui contient les données selon le cycle
     nb_etudiants_cycle = {}
     for cycle in cycles:
         if cycle in nb_etudiants_cycle:
@@ -121,6 +189,22 @@ def diagramme3():
     plt.show()
 diagramme3()
 
+
+
+
+
+def diagramme4():
+    nb_etudiants_cycle = {}
+    for cycle in cycles:
+        if cycle in nb_etudiants_cycle:
+            nb_etudiants_cycle[cycle] +=1
+        else:
+            nb_etudiants_cycle[cycle] = 1
+    plt.figure(figsize=(8,8))
+    plt.pie(nb_etudiants_cycle.values(), labels=nb_etudiants_cycle.keys(), autopct='%1.1f')
+    plt.legend(loc='best')
+    plt.show()
+diagramme4()
 """
 moyenne_grandeur = np.mean(grandeurs)
 ecart_type_grandeur = np.std(grandeurs)
